@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 public class Card : MonoBehaviour
 {
+    public int cardId;
     public CardData data;
     public GameObject front;
     public GameObject back;

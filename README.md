@@ -11,14 +11,14 @@
 - [x] Handle game over state (all cards matched)
 
 ### 🔁 Layout & Scaling
-- [ ] Support various grid layouts (e.g., 2x2, 2x3, 5x6)
-- [ ] Ensure cards scale to fit screen or container dynamically
+- [x] Support various grid layouts (e.g., 2x2, 2x3, 5x6)
+- [x] Ensure cards scale to fit screen or container dynamically
 
 ### 💾 Persistence
 - [ ] Implement save/load system to retain game progress
 
 ### 🧮 Scoring System
-- [ ] Add scoring based on player actions
+- [x] Add scoring based on player actions
 - [ ] (Optional) Implement a combo system for quick matches
 
 ### 🔊 Sound Effects

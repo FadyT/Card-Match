@@ -1,9 +1,12 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+
+    public TextMeshProUGUI scoreText;
     private bool gameEnded = false;
     public GameObject gameOverPanel;
     public int totalCards;
@@ -18,7 +21,10 @@ public class GameManager : MonoBehaviour
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
     }
-
+    public void UpdateScoreText(int score)
+    {
+        scoreText.text = "Score: " + score.ToString();
+    }
     public void CardFlipped(Card card)
     {
         if (gameEnded) return;
@@ -66,6 +72,8 @@ public class GameManager : MonoBehaviour
                 card2.MisMatch();
                 score -= 2;
             }
+            UpdateScoreText(score);
+
         }
     }
     public void ShowGameOver()
