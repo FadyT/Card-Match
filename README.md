@@ -5,10 +5,10 @@
 
 ### 🕹 Core Gameplay
 - [x] Implement card flipping with smooth animations
-- [ ] Allow uninterrupted card flipping (non-blocking comparisons)
-- [ ] Handle matching and mismatching logic
-- [ ] Add animation for matched/mismatched cards
-- [ ] Handle game over state (all cards matched)
+- [x] Allow uninterrupted card flipping (non-blocking comparisons)
+- [x] Handle matching and mismatching logic
+- [x] Add animation for matched/mismatched cards
+- [x] Handle game over state (all cards matched)
 
 ### 🔁 Layout & Scaling
 - [ ] Support various grid layouts (e.g., 2x2, 2x3, 5x6)

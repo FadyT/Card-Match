@@ -8,6 +8,8 @@ public class Card : MonoBehaviour
     public GameObject back;
 
     public bool isFlipped = false;
+    public bool isMatched = false;
+
     Animator animator;
 
 
@@ -15,13 +17,16 @@ public class Card : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         front.GetComponent<Image>().sprite = data.image;
+
     }
 
     public void OnClick()
     {
-        if (isFlipped ) return;
+        if (isFlipped || isMatched) return;
+        GameManager.Instance.CardFlipped(this);
 
         Flip();
+
     }
 
     public void Flip()
@@ -41,7 +46,16 @@ public class Card : MonoBehaviour
         animator.SetTrigger("FlipToFront");
     }
 
-    public void ShowBack() {
+    public void ShowBack()
+    {
         animator.SetTrigger("FlipToBack");
+    }
+        public void Match()
+    {
+        animator.SetTrigger("Match");
+    }    public void MisMatch()
+    {
+        animator.SetTrigger("MisMatch");
+        ShowBack();
     }
 }
