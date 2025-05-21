@@ -4,7 +4,7 @@
 - [x] Create a new empty Unity 2021 LTS project and push as first commit
 
 ### 🕹 Core Gameplay
-- [ ] Implement card flipping with smooth animations
+- [x] Implement card flipping with smooth animations
 - [ ] Allow uninterrupted card flipping (non-blocking comparisons)
 - [ ] Handle matching and mismatching logic
 - [ ] Add animation for matched/mismatched cards
