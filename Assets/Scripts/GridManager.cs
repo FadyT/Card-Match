@@ -51,9 +51,21 @@ public class GridManager : MonoBehaviour
         }
 
         var allCards = new List<CardData>();
-
-        // Generate pairs without needing unique cards
-        for (int i = 0; i < totalCards / 2; i++)
+        int numPairs = totalCards / 2;
+        if (cardDataList.Count >= numPairs)
+        {
+            List<CardData> shuffled = new List<CardData>(cardDataList);
+            Shuffle(shuffled);
+            for (int i = 0; i < numPairs; i++)
+            {
+             allCards.Add(shuffled[i]);
+             allCards.Add(shuffled[i]);
+            }
+        }
+    else
+    {
+        // Not enough unique cards, allow duplicates
+        for (int i = 0; i < numPairs; i++)
         {
             // Choose a random cardData (even if it's already used)
             var randomCard = cardDataList[Random.Range(0, cardDataList.Count)];
@@ -62,6 +74,8 @@ public class GridManager : MonoBehaviour
             allCards.Add(randomCard);
             allCards.Add(randomCard);
         }
+    }
+
 
         Shuffle(allCards);
 

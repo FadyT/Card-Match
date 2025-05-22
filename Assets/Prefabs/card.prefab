@@ -33,10 +33,10 @@ RectTransform:
   m_Father: {fileID: 7674549746830670748}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -8.88, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -100, y: -100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &586268040892958671
 CanvasRenderer:
@@ -245,10 +245,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6dfcbe2c96f90407d85c222afa577e55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cardId: 0
   data: {fileID: 0}
   front: {fileID: 6688707564051375515}
   back: {fileID: 6831207684816116438}
   isFlipped: 0
+  isMatched: 0
 --- !u!114 &7340560492308001118
 MonoBehaviour:
   m_ObjectHideFlags: 0
