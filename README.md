@@ -15,7 +15,7 @@
 - [x] Ensure cards scale to fit screen or container dynamically
 
 ### 💾 Persistence
-- [ ] Implement save/load system to retain game progress
+- [x] Implement save/load system to retain game progress
 
 ### 🧮 Scoring System
 - [x] Add scoring based on player actions
