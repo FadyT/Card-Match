@@ -3,71 +3,76 @@ using UnityEngine.UI;
 
 public class Card : MonoBehaviour
 {
-    public int cardId;
-    public CardData data;
+    [Header("References")]
     public GameObject front;
     public GameObject back;
+    public Animator animator;
 
+    public CardData data;
     public bool isFlipped = false;
     public bool isMatched = false;
 
-    public Animator animator;
+    private Image frontImage;
 
-void Start()
-{
-    if (data != null && front != null)
+    private void Awake()
     {
-        Image frontImage = front.GetComponent<Image>();
-        if (frontImage != null && data.image != null)
-        {
-            frontImage.sprite = data.image;
-        }
+        frontImage = front != null ? front.GetComponent<Image>() : null;
     }
-}
 
+    public void Setup(CardData newData)
+    {
+        data = newData;
+        isFlipped = false;
+        isMatched = false;
+
+        if (frontImage != null && data != null && data.image != null)
+            frontImage.sprite = data.image;
+
+        ShowBackInstant();
+    }
 
     public void OnClick()
     {
-        if (isFlipped || isMatched) return;
+        if (isFlipped || isMatched || GameManager.Instance == null) return;
         GameManager.Instance.CardFlipped(this);
-
-        Flip();
-
     }
 
     public void Flip()
     {
-        AudioManager.Instance.PlayCardFlip();
+        if (isFlipped || isMatched) return;
+
         isFlipped = true;
-        ShowFront();
+        animator.SetTrigger("FlipToFront");
+        AudioManager.Instance?.PlayCardFlip();
     }
 
     public void Unflip()
     {
         isFlipped = false;
-        ShowBack();
-    }
-
-    public void ShowFront()
-    {
-        animator.SetTrigger("FlipToFront");
-    }
-
-    public void ShowBack()
-    {
         animator.SetTrigger("FlipToBack");
     }
+
     public void Match()
     {
+        isMatched = true;
         animator.SetTrigger("Match");
-        AudioManager.Instance.PlayMatch();
-
+        AudioManager.Instance?.PlayMatch();
     }
+
     public void MisMatch()
     {
+        isMatched = false;
+        isFlipped = false;
         animator.SetTrigger("MisMatch");
-        AudioManager.Instance.PlayMismatch();
-        ShowBack();
+        AudioManager.Instance?.PlayMismatch();
     }
-    
+    public void SetMatched(bool value)
+    {
+        isMatched = value;  
+    }
+
+    private void ShowBackInstant()
+    {
+        animator.Play("Back", 0, 1f); // Ensure card starts back-side
+    }
 }

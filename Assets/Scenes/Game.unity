@@ -2515,19 +2515,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1542cdbd136694e209049cecc5755c22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waveText: {fileID: 1559903208}
-  scoreText: {fileID: 484082180}
-  GameOverText: {fileID: 626712673}
-  gameOverPanel: {fileID: 1504421916}
+  UI_WaveText: {fileID: 1559903208}
+  UI_ScoreText: {fileID: 484082180}
+  UI_GameOverText: {fileID: 626712673}
+  UI_GameOverPanel: {fileID: 1504421916}
+  UI_TimerText: {fileID: 429678968}
+  UI_LivesText: {fileID: 1045067051}
+  maxWaves: 100
+  initialWaveTime: 300
+  initialLives: 20
   totalCards: 4
-  flippedCards: []
   score: 0
   currentWave: 1
-  maxWaves: 100
-  waveTime: 300
   lives: 20
-  timerText: {fileID: 429678968}
-  livesText: {fileID: 1045067051}
+  matchedCards: 0
 --- !u!4 &1578025408
 Transform:
   m_ObjectHideFlags: 0

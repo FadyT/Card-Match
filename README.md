@@ -28,11 +28,11 @@
 - [x] Add sound for game over
 
 ### 🧪 Quality & Platform Support
-- [ ] Ensure no crashes, errors, or warnings
-- [ ] Ensure it runs smoothly on desktop
-- [ ] Ensure it runs on Android or iOS
+- [x] Ensure no crashes, errors, or warnings
+- [x] Ensure it runs smoothly on desktop
+- [x] Ensure it runs on Android or iOS
 
 ### 🆓 Extras (Optional but Recommended)
 - [x] Add basic menu (e.g., Start, Restart)
-- [ ] Optimize code readability and performance
+- [x] Optimize code readability and performance
 - [ ] Add visual polish without relying on purchased assets

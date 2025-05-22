@@ -5,137 +5,135 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }
 
-    public TextMeshProUGUI waveText;
-    public TextMeshProUGUI scoreText;
-    public TextMeshProUGUI GameOverText;
-    private bool gameEnded = false;
-    public GameObject gameOverPanel;
-    public int totalCards;
-    private int matchedCards = 0;
-    public static GameManager Instance;
+    [Header("UI")]
+    public TextMeshProUGUI UI_WaveText;
+    public TextMeshProUGUI UI_ScoreText;
+    public TextMeshProUGUI UI_GameOverText;
+    public GameObject UI_GameOverPanel;
+    public TextMeshProUGUI UI_TimerText;
+    public TextMeshProUGUI UI_LivesText;
 
-    public List<Card> flippedCards = new List<Card>();
-    public int score = 0;
-
-    public int currentWave = 1;
+    [Header("Gameplay Settings")]
     public int maxWaves = 100;
-    public float waveTime = 300f; // 5 minutes in seconds
-    public int lives = 20;
-    public TextMeshProUGUI timerText;
-    public TextMeshProUGUI livesText;
+    public float initialWaveTime = 300f;
+    public int initialLives = 20;
+
+    [Header("State")]
+    public int totalCards;
+    public int score;
+    public int currentWave = 1;
+    public int lives;
 
     private float currentTime;
     private bool isTimerRunning = false;
-    [SerializeField]
-    //private bool clearData = false;
+    private bool gameEnded = false;
+    public int matchedCards = 0;
 
-    void Awake()
+    private List<Card> flippedCards = new List<Card>();
+
+    private const float WaveTimeDecrement = 5f;
+    private const int LivesDecrementRate = 5;
+    private const float DelayBeforeNextWave = 2f;
+    private const float DelayBeforeMatchCheck = 0.5f;
+
+    #region Unity Lifecycle
+
+    private void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
-
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
     }
-    void Start()
+
+    private void Start()
     {
-        currentTime = 300;
-        isTimerRunning = false;
+        currentTime = initialWaveTime;
+
         if (HasClearData())
         {
             PlayerPrefs.DeleteAll();
             PlayerPrefs.Save();
             StartWave();
-
         }
         else
         {
             var saved = SaveSystem.LoadGame();
-            if (saved != null)
-            {
-                RestoreGame(saved);
-            }
-        }
-    }
-bool HasClearData()
-{
-    var data = SaveSystem.LoadGame();
-    return data != null && data.clearData;
-}
-    void Update()
-    {
-        if (isTimerRunning)
-        {
-            currentTime -= Time.deltaTime;
-            timerText.text = "Time: " + Mathf.CeilToInt(currentTime) + "s";
-
-            if (currentTime <= 0)
-            {
-                GameOver("Time's up!");
-            }
+            if (saved != null) RestoreGame(saved);
+            else StartWave();
         }
     }
 
-    void StartWave()
+    private void Update()
     {
+        if (!isTimerRunning) return;
+
+        currentTime -= Time.deltaTime;
+        UI_TimerText.text = "Time: " + Mathf.CeilToInt(currentTime) + "s";
+
+        if (currentTime <= 0)
+            TriggerGameOver("Time's up!");
+    }
+
+    private void OnApplicationPause(bool pause) => SaveIfNeeded(pause);
+    private void OnApplicationQuit() => SaveIfNeeded(true);
+
+    private void SaveIfNeeded(bool shouldSave)
+    {
+        if (shouldSave && !gameEnded)
+            SaveCurrentGame();
+    }
+
+    #endregion
+
+    #region Wave Handling
+
+    private void StartWave()
+    {
+        flippedCards.Clear();
         matchedCards = 0;
         totalCards = 0;
-        flippedCards.Clear();
-        currentTime = waveTime;
+        currentTime = initialWaveTime - currentWave * 5;
         isTimerRunning = true;
-        GameObject.FindObjectOfType<GridManager>().SetupWave(currentWave); // call new wave
-        livesText.text = "Lives: " + lives;
-        waveText.text = "Wave: " + currentWave;
+
+        GridManager.Instance.SetupWave(currentWave);
+        UpdateUI();
+    }
+
+    private IEnumerator NextWaveDelay()
+    {
+        yield return new WaitForSeconds(DelayBeforeNextWave);
+        StartWave();
     }
 
     public void CardMatched()
     {
         matchedCards += 2;
 
-        if (matchedCards >= totalCards)
+        if (matchedCards < totalCards) return;
+
+        isTimerRunning = false;
+        currentWave++;
+
+        if (currentWave > maxWaves)
         {
-            isTimerRunning = false;
-            currentWave++;
-            if (currentWave > maxWaves)
-            {
-                GameOver("You completed all waves!");
-            }
-            else
-            {
-                waveTime = Mathf.Max(30f, waveTime - 5f); // Decrease time by 5 sec for each wave
-                lives = Mathf.Max(1, 20 - currentWave / 5); // Decrease lives each 5 waves
-                StartCoroutine(NextWaveDelay());
-            }
+            TriggerGameOver("You completed all waves!");
+        }
+        else
+        {
+            initialWaveTime = Mathf.Max(30f, initialWaveTime - WaveTimeDecrement);
+            lives = Mathf.Max(1, initialLives - currentWave / LivesDecrementRate);
+            StartCoroutine(NextWaveDelay());
         }
     }
 
-    IEnumerator NextWaveDelay()
-    {
-        yield return new WaitForSeconds(2f);
-        StartWave();
-    }
+    #endregion
 
-    void GameOver(string reason)
-    {
+    #region Card Logic
 
-        SaveSystem.SetClearDataFlag(true);
-        GameOverText.text = reason;
-        isTimerRunning = false;
-        gameEnded = true;
-        Debug.Log("Game Over: " + reason);
-        AudioManager.Instance.PlayGameOver();
-        gameOverPanel.SetActive(true);
-    }
-
-    public void UpdateScoreText(int score)
-    {
-        scoreText.text = "Score: " + score.ToString();
-    }
     public void CardFlipped(Card card)
     {
-        if (gameEnded) return;
-
-        if (card.isFlipped || card.isMatched || flippedCards.Contains(card))
-            return;
+        if (gameEnded || card.isFlipped || card.isMatched || flippedCards.Contains(card)) return;
 
         flippedCards.Add(card);
         card.Flip();
@@ -145,55 +143,65 @@ bool HasClearData()
             StartCoroutine(CheckMatch(flippedCards[0], flippedCards[1]));
             flippedCards.Clear();
         }
-
-        IEnumerator CheckMatch(Card card1, Card card2)
-        {
-
-            yield return new WaitForSeconds(0.5f);
-
-            if (card1.data.id == card2.data.id)
-            {
-                card1.isMatched = true;
-                card2.isMatched = true;
-                card1.Match();
-                card2.Match();
-                score += 10;
-                matchedCards += 2;
-                card1.Match();
-                card2.Match();
-
-                if (matchedCards >= totalCards)
-                {
-                    yield return new WaitForSeconds(1f);
-
-                    CardMatched();
-                }
-            }
-            else
-            {
-                card1.Unflip();
-                card2.Unflip();
-                card1.MisMatch();
-                card2.MisMatch();
-                if (score >= 2)
-                {
-                score -= 2;
-                }
-                lives--;
-                livesText.text = "Lives: " + lives;
-
-                if (lives <= 0)
-                {
-                    GameOver("too many Mismatched cards");
-                }
-
-            }
-            UpdateScoreText(score);
-
-        }
     }
 
-    public void SaveCurrentGame()
+    private IEnumerator CheckMatch(Card card1, Card card2)
+    {
+        yield return new WaitForSeconds(DelayBeforeMatchCheck);
+
+        if (card1.data.id == card2.data.id)
+        {
+            card1.SetMatched(true);
+            card2.SetMatched(true);
+            card1.Match();
+            card2.Match();
+
+            score += 10;
+            matchedCards += 2;
+
+            if (matchedCards >= totalCards)
+            {
+                yield return new WaitForSeconds(1f);
+                CardMatched();
+            }
+        }
+        else
+        {
+            card1.Unflip();
+            card2.Unflip();
+            card1.MisMatch();
+            card2.MisMatch();
+
+            score = Mathf.Max(0, score - 2);
+            lives--;
+
+            if (lives <= 0)
+                TriggerGameOver("Too many mismatched cards");
+        }
+
+        UpdateUI();
+    }
+
+    #endregion
+
+    #region Game Over
+
+    private void TriggerGameOver(string reason)
+    {
+        SaveSystem.SetClearDataFlag(true);
+        UI_GameOverText.text = reason;
+        isTimerRunning = false;
+        gameEnded = true;
+        AudioManager.Instance?.PlayGameOver();
+        UI_GameOverPanel.SetActive(true);
+        Debug.Log("Game Over: " + reason);
+    }
+
+    #endregion
+
+    #region Save / Load
+
+    private void SaveCurrentGame()
     {
         var data = new GameSaveData
         {
@@ -206,60 +214,69 @@ bool HasClearData()
             cards = new List<CardSaveData>()
         };
 
-        foreach (Transform cardObj in GameObject.FindObjectOfType<GridManager>().gridParent)
+
+        foreach (Card card in GridManager.Instance.GetActiveCards())
         {
-            Card card = cardObj.GetComponent<Card>();
             data.cards.Add(new CardSaveData
             {
                 id = card.data.id,
                 isFlipped = card.isFlipped,
                 isMatched = card.isMatched
             });
+        Debug.Log("GameManagerSaving" + card.isFlipped + " : " + card.isMatched);
+
         }
+
+
 
         SaveSystem.SaveGame(data);
     }
-    void RestoreGame(GameSaveData data)
-{
-    score = data.score;
-    currentWave = data.wave;
-    lives = data.lives;
-    currentTime = data.remainingTime;
-    totalCards = data.totalCards;
-    matchedCards = data.matchedCards;
 
-    livesText.text = "Lives: " + lives;
-    waveText.text = "Wave: " + currentWave;
-    timerText.text = "Time: " + Mathf.CeilToInt(currentTime) + "s";
-    scoreText.text = "Score: " + score.ToString();
-        isTimerRunning = true;
-    StartCoroutine(DelayedRestore(data));
-}
-
-IEnumerator DelayedRestore(GameSaveData data)
-{
-    GameObject.FindObjectOfType<GridManager>().SetupWave(currentWave);
-
-    // Wait until cards are generated (1 frame delay is usually enough)
-    yield return new WaitForSeconds(0.1f);
-
-    GameObject.FindObjectOfType<GridManager>().GenerateSavedCards(data.cards);
-}
-
-
-    void OnApplicationPause(bool pause)
-{
-    if (pause && !gameEnded) SaveCurrentGame();
-}
-
-void OnApplicationQuit()
-{
-        if (!gameEnded)
-        {
-    SaveCurrentGame();
+    private void RestoreGame(GameSaveData data)
+    {
         
+        score = data.score;
+        currentWave = data.wave;
+        lives = data.lives;
+        currentTime = data.remainingTime;
+        totalCards = data.totalCards;
+        matchedCards = data.matchedCards;
+        
+        UpdateUI();
+        isTimerRunning = true;
+        StartCoroutine(DelayedRestore(data));
+
     }
-}
 
+    private IEnumerator DelayedRestore(GameSaveData data)
+    {
+        GridManager.Instance.SetupWave(currentWave);
+        yield return new WaitForSeconds(0.1f);
+        GridManager.Instance.GenerateSavedCards(data.cards);
 
+        if (totalCards <= matchedCards)
+        {
+            CardMatched();
+        }
+    }
+
+    private bool HasClearData()
+    {
+        var data = SaveSystem.LoadGame();
+        return data != null && data.clearData;
+    }
+
+    #endregion
+
+    #region UI
+
+    private void UpdateUI()
+    {
+        UI_LivesText.text = "Lives: " + lives;
+        UI_WaveText.text = "Wave: " + currentWave;
+        UI_TimerText.text = "Time: " + Mathf.CeilToInt(currentTime) + "s";
+        UI_ScoreText.text = "Score: " + score;
+    }
+
+    #endregion
 }
