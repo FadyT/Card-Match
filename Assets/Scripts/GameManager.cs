@@ -2,15 +2,19 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class GameManager : MonoBehaviour
 {
+    // combo
+    public int comboCount = 0;
+
     public static GameManager Instance { get; private set; }
 
     [Header("UI")]
+    public TextMeshProUGUI UI_MotivationText;
     public TextMeshProUGUI UI_WaveText;
     public TextMeshProUGUI UI_ScoreText;
-    public TextMeshProUGUI UI_GameOverText;
     public GameObject UI_GameOverPanel;
     public TextMeshProUGUI UI_TimerText;
     public TextMeshProUGUI UI_LivesText;
@@ -90,6 +94,8 @@ public class GameManager : MonoBehaviour
 
     private void StartWave()
     {
+
+        gameEnded = false;
         flippedCards.Clear();
         matchedCards = 0;
         totalCards = 0;
@@ -145,6 +151,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private readonly string[] motivationWords = { "Great!", "Good job!", "Awesome!", "Well done!", "Fantastic!" };
+
+
     private IEnumerator CheckMatch(Card card1, Card card2)
     {
         yield return new WaitForSeconds(DelayBeforeMatchCheck);
@@ -156,17 +165,27 @@ public class GameManager : MonoBehaviour
             card1.Match();
             card2.Match();
 
-            score += 10;
             matchedCards += 2;
+
+            score += comboCount * 5 +10;
+            comboCount++;
+
+            if (comboCount > 1)
+            {
+                ShowMotivationText(comboCount);
+            }
 
             if (matchedCards >= totalCards)
             {
+                SaveCurrentGame();
+                gameEnded = true;
                 yield return new WaitForSeconds(1f);
                 CardMatched();
             }
         }
         else
         {
+            comboCount = 0;
             card1.Unflip();
             card2.Unflip();
             card1.MisMatch();
@@ -182,6 +201,27 @@ public class GameManager : MonoBehaviour
         UpdateUI();
     }
 
+
+    private void ShowMotivationText(int comboCount)
+    {
+        // Pick a random motivation word from array
+        string message = motivationWords[Random.Range(0, motivationWords.Length)];
+
+        message += $" x{comboCount}";
+
+        UI_MotivationText.text = message;
+        UI_MotivationText.gameObject.SetActive(true);
+
+        // Hide after 1.5 seconds
+        StartCoroutine(HideMotivationText());
+    }
+
+private IEnumerator HideMotivationText()
+{
+    yield return new WaitForSeconds(0.25f);
+    UI_MotivationText.gameObject.SetActive(false);
+}
+
     #endregion
 
     #region Game Over
@@ -189,7 +229,6 @@ public class GameManager : MonoBehaviour
     private void TriggerGameOver(string reason)
     {
         SaveSystem.SetClearDataFlag(true);
-        UI_GameOverText.text = reason;
         isTimerRunning = false;
         gameEnded = true;
         AudioManager.Instance?.PlayGameOver();
