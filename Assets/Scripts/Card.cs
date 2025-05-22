@@ -11,15 +11,20 @@ public class Card : MonoBehaviour
     public bool isFlipped = false;
     public bool isMatched = false;
 
-    Animator animator;
+    public Animator animator;
 
-
-    void Start()
+void Start()
+{
+    if (data != null && front != null)
     {
-        animator = GetComponent<Animator>();
-        front.GetComponent<Image>().sprite = data.image;
-
+        Image frontImage = front.GetComponent<Image>();
+        if (frontImage != null && data.image != null)
+        {
+            frontImage.sprite = data.image;
+        }
     }
+}
+
 
     public void OnClick()
     {
@@ -57,10 +62,12 @@ public class Card : MonoBehaviour
         animator.SetTrigger("Match");
         AudioManager.Instance.PlayMatch();
 
-    }    public void MisMatch()
+    }
+    public void MisMatch()
     {
         animator.SetTrigger("MisMatch");
         AudioManager.Instance.PlayMismatch();
         ShowBack();
     }
+    
 }

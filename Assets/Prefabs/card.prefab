@@ -251,6 +251,7 @@ MonoBehaviour:
   back: {fileID: 6831207684816116438}
   isFlipped: 0
   isMatched: 0
+  animator: {fileID: 9108025587461523535}
 --- !u!114 &7340560492308001118
 MonoBehaviour:
   m_ObjectHideFlags: 0

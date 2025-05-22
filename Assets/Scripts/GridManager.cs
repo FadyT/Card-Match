@@ -62,19 +62,19 @@ public class GridManager : MonoBehaviour
              allCards.Add(shuffled[i]);
             }
         }
-    else
-    {
-        // Not enough unique cards, allow duplicates
-        for (int i = 0; i < numPairs; i++)
+        else
         {
-            // Choose a random cardData (even if it's already used)
-            var randomCard = cardDataList[Random.Range(0, cardDataList.Count)];
+            // Not enough unique cards, allow duplicates
+            for (int i = 0; i < numPairs; i++)
+            {
+                // Choose a random cardData (even if it's already used)
+                var randomCard = cardDataList[Random.Range(0, cardDataList.Count)];
 
-            // Add it twice to form a pair
-            allCards.Add(randomCard);
-            allCards.Add(randomCard);
+                // Add it twice to form a pair
+                allCards.Add(randomCard);
+                allCards.Add(randomCard);
+            }
         }
-    }
 
 
         Shuffle(allCards);
@@ -126,53 +126,98 @@ public class GridManager : MonoBehaviour
     }
 
 
-public void SetupWave(int waveNumber)
-{
-    ClearOldCards();
-
-    int maxCards = 100;
-
-    int baseTotal = 2 + waveNumber * 2;  
-    if (baseTotal > maxCards) baseTotal = maxCards;
-
-    // make sure total cards number is even
-    if (baseTotal % 2 != 0) baseTotal++;
-
-    // set totalCards that can fit the screen
-    int bestRows = 2;
-    int bestCols = baseTotal / 2;
-    float bestRatioDiff = Mathf.Abs(bestRows - bestCols);
-
-    for (int r = 2; r <= 10; r++)
+    public void SetupWave(int waveNumber)
     {
-        for (int c = 2; c <= 10; c++)
+        ClearOldCards();
+
+        int maxCards = 100;
+
+        int baseTotal = 2 + waveNumber * 2;
+        if (baseTotal > maxCards) baseTotal = maxCards;
+
+        // make sure total cards number is even
+        if (baseTotal % 2 != 0) baseTotal++;
+
+        // set totalCards that can fit the screen
+        int bestRows = 2;
+        int bestCols = baseTotal / 2;
+        float bestRatioDiff = Mathf.Abs(bestRows - bestCols);
+
+        for (int r = 2; r <= 10; r++)
         {
-            if (r * c == baseTotal)
+            for (int c = 2; c <= 10; c++)
             {
-                float ratioDiff = Mathf.Abs(r - c);
-                if (ratioDiff < bestRatioDiff)
+                if (r * c == baseTotal)
                 {
-                    bestRows = r;
-                    bestCols = c;
-                    bestRatioDiff = ratioDiff;
+                    float ratioDiff = Mathf.Abs(r - c);
+                    if (ratioDiff < bestRatioDiff)
+                    {
+                        bestRows = r;
+                        bestCols = c;
+                        bestRatioDiff = ratioDiff;
+                    }
                 }
             }
         }
+
+        rows = bestRows;
+        columns = bestCols;
+
+        GenerateCards(baseTotal);
+        StartCoroutine(DelayedSetupGridLayout());
     }
 
-    rows = bestRows;
-    columns = bestCols;
 
-    GenerateCards(baseTotal);
+    void ClearOldCards()
+    {
+        foreach (Transform child in gridParent)
+        {
+            Destroy(child.gameObject);
+        }
+    }
+
+public void GenerateSavedCards(List<CardSaveData> savedCards)
+{
+    ClearOldCards();
+    foreach (var cardData in savedCards)
+    {
+        GameObject cardObj = Instantiate(cardPrefab, gridParent);
+        Card card = cardObj.GetComponent<Card>();
+
+        var data = cardDataList.Find(d => d.id == cardData.id);
+        card.data = data;
+
+        // Set front sprite immediately
+        Image frontImage = card.front.GetComponent<Image>();
+        if (frontImage != null && data != null)
+        {
+            frontImage.sprite = data.image;
+        }
+
+        // Restore state
+        card.isMatched = cardData.isMatched;
+        card.isFlipped = cardData.isFlipped;
+
+            if (card.isFlipped )
+            {
+                if (card.isMatched)
+                {
+                    card.ShowFront(); // Flip visual only
+                }
+                else
+                {
+                    card.isFlipped = false;
+                }
+            }
+            else
+            {
+                card.ShowBack();
+            }
+    }
+
+    GameManager.Instance.totalCards = savedCards.Count;
     StartCoroutine(DelayedSetupGridLayout());
 }
 
 
-    void ClearOldCards()
-{
-    foreach (Transform child in gridParent)
-    {
-        Destroy(child.gameObject);
-    }
-}
 }
