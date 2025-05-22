@@ -32,6 +32,7 @@ public class Card : MonoBehaviour
 
     public void Flip()
     {
+        AudioManager.Instance.PlayCardFlip();
         isFlipped = true;
         ShowFront();
     }
@@ -51,12 +52,15 @@ public class Card : MonoBehaviour
     {
         animator.SetTrigger("FlipToBack");
     }
-        public void Match()
+    public void Match()
     {
         animator.SetTrigger("Match");
+        AudioManager.Instance.PlayMatch();
+
     }    public void MisMatch()
     {
         animator.SetTrigger("MisMatch");
+        AudioManager.Instance.PlayMismatch();
         ShowBack();
     }
 }

@@ -22,10 +22,10 @@
 - [ ] (Optional) Implement a combo system for quick matches
 
 ### 🔊 Sound Effects
-- [ ] Add sound for card flip
-- [ ] Add sound for match
-- [ ] Add sound for mismatch
-- [ ] Add sound for game over
+- [x] Add sound for card flip
+- [x] Add sound for match
+- [x] Add sound for mismatch
+- [x] Add sound for game over
 
 ### 🧪 Quality & Platform Support
 - [ ] Ensure no crashes, errors, or warnings

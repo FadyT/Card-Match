@@ -97,6 +97,7 @@ IEnumerator NextWaveDelay()
         isTimerRunning = false;
         gameEnded = true;
         Debug.Log("Game Over: " + reason);
+        AudioManager.Instance.PlayGameOver();
         gameOverPanel.SetActive(true);
     }
 
