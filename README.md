@@ -33,6 +33,6 @@
 - [ ] Ensure it runs on Android or iOS
 
 ### 🆓 Extras (Optional but Recommended)
-- [ ] Add basic menu (e.g., Start, Restart)
+- [x] Add basic menu (e.g., Start, Restart)
 - [ ] Optimize code readability and performance
 - [ ] Add visual polish without relying on purchased assets

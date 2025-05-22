@@ -11,7 +11,12 @@ public static class SaveSystem
         string json = JsonUtility.ToJson(data);
         File.WriteAllText(savePath, json);
     }
-
+public static void SetClearDataFlag(bool value)
+{
+    GameSaveData data = LoadGame() ?? new GameSaveData();
+    data.clearData = value;
+    SaveGame(data);
+}
     public static GameSaveData LoadGame()
     {
         if (!File.Exists(savePath)) return null;
@@ -27,6 +32,7 @@ public static class SaveSystem
 [System.Serializable]
 public class GameSaveData
 {
+    public bool clearData;
     public int totalCards;
     public int matchedCards;
     public int score;

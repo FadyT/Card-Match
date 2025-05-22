@@ -3,11 +3,16 @@ using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
-    public void RestartGame()
+
+    public void NewGame()
     {
-        PlayerPrefs.DeleteAll();
-        PlayerPrefs.Save();
-        // Reloads the currently active scene
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SaveSystem.SetClearDataFlag(true);
+
+        SceneManager.LoadScene("Game");
+    }
+    public void Resume()
+    {
+        SaveSystem.SetClearDataFlag(false);
+        SceneManager.LoadScene("Game");
     }
 }

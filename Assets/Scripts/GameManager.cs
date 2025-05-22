@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
     private float currentTime;
     private bool isTimerRunning = false;
     [SerializeField]
-    private bool clearData = false;
+    //private bool clearData = false;
 
     void Awake()
     {
@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour
     {
         currentTime = 300;
         isTimerRunning = false;
-        if (clearData)
+        if (HasClearData())
         {
             PlayerPrefs.DeleteAll();
             PlayerPrefs.Save();
@@ -56,7 +56,11 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
+bool HasClearData()
+{
+    var data = SaveSystem.LoadGame();
+    return data != null && data.clearData;
+}
     void Update()
     {
         if (isTimerRunning)
@@ -112,6 +116,8 @@ public class GameManager : MonoBehaviour
 
     void GameOver(string reason)
     {
+
+        SaveSystem.SetClearDataFlag(true);
         GameOverText.text = reason;
         isTimerRunning = false;
         gameEnded = true;
@@ -169,7 +175,10 @@ public class GameManager : MonoBehaviour
                 card2.Unflip();
                 card1.MisMatch();
                 card2.MisMatch();
+                if (score >= 2)
+                {
                 score -= 2;
+                }
                 lives--;
                 livesText.text = "Lives: " + lives;
 
@@ -240,12 +249,16 @@ IEnumerator DelayedRestore(GameSaveData data)
 
     void OnApplicationPause(bool pause)
 {
-    if (pause) SaveCurrentGame();
+    if (pause && !gameEnded) SaveCurrentGame();
 }
 
 void OnApplicationQuit()
 {
+        if (!gameEnded)
+        {
     SaveCurrentGame();
+        
+    }
 }
 
 
