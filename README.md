@@ -19,7 +19,7 @@
 
 ### 🧮 Scoring System
 - [x] Add scoring based on player actions
-- [ ] (Optional) Implement a combo system for quick matches
+- [x] (Optional) Implement a combo system for quick matches
 
 ### 🔊 Sound Effects
 - [x] Add sound for card flip
@@ -35,4 +35,4 @@
 ### 🆓 Extras (Optional but Recommended)
 - [x] Add basic menu (e.g., Start, Restart)
 - [x] Optimize code readability and performance
-- [ ] Add visual polish without relying on purchased assets
+- [x] Add visual polish without relying on purchased assets
