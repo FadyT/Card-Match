@@ -93,13 +93,14 @@ public class GridManager : MonoBehaviour
 
             if (card.isMatched)
             {
-                card.animator.SetTrigger("FlipToFront");
+                card.ShowCardFront(true);
+
 
             }
             else
             {
                 card.isFlipped = false;
-                card.animator.SetTrigger("FlipToBack");
+                card.ShowCardFront(false);
             }
 
 
