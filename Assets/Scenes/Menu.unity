@@ -278,6 +278,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e8b689453bf540ec9ccdb1011ac2263, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  resumButton: {fileID: 6221253952307768088}
 --- !u!1 &1094738431
 GameObject:
   m_ObjectHideFlags: 0
@@ -718,10 +719,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
+    m_Left: 50
+    m_Right: 50
+    m_Top: 30
+    m_Bottom: 30
   m_ChildAlignment: 4
   m_Spacing: 30
   m_ChildForceExpandWidth: 1

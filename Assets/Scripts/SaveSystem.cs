@@ -11,12 +11,18 @@ public static class SaveSystem
         string json = JsonUtility.ToJson(data);
         File.WriteAllText(savePath, json);
     }
-public static void SetClearDataFlag(bool value)
-{
-    GameSaveData data = LoadGame() ?? new GameSaveData();
-    data.clearData = value;
-    SaveGame(data);
-}
+
+    public static bool HasSavedData()
+    {
+        return File.Exists(savePath);
+    }
+
+    public static void SetClearDataFlag(bool value)
+    {
+        GameSaveData data = LoadGame() ?? new GameSaveData();
+        data.clearData = value;
+        SaveGame(data);
+    }
     public static GameSaveData LoadGame()
     {
         if (!File.Exists(savePath)) return null;

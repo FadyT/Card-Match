@@ -73,7 +73,7 @@ public class GridManager : MonoBehaviour
 
         foreach (var cardData in savedCards)
         {
-           GameObject cardObj;
+            GameObject cardObj;
             if (cardPool.Count > 0)
             {
                 cardObj = cardPool.Dequeue();
@@ -95,7 +95,7 @@ public class GridManager : MonoBehaviour
             {
                 card.animator.SetTrigger("FlipToFront");
 
-                }
+            }
             else
             {
                 card.isFlipped = false;
@@ -104,8 +104,15 @@ public class GridManager : MonoBehaviour
 
 
             var frontImage = card.front.GetComponent<Image>();
-            if (frontImage != null && card.data != null)
-                frontImage.sprite = card.data.image;
+
+            if (frontImage != null && cardObj.GetComponent<Card>().data != null)
+            {
+                frontImage.sprite = cardObj.GetComponent<Card>().data.image;
+                frontImage.type = Image.Type.Simple;
+                frontImage.preserveAspect = true;
+                print("preserve aspect : " + frontImage.preserveAspect);
+            }                
+            
         }
 
         GameManager.Instance.totalCards = savedCards.Count;
@@ -139,7 +146,12 @@ public class GridManager : MonoBehaviour
 
             var frontImage = cardObj.GetComponent<Card>().front.GetComponent<Image>();
             if (frontImage != null && cardObj.GetComponent<Card>().data != null)
+            {
                 frontImage.sprite = cardObj.GetComponent<Card>().data.image;
+                frontImage.type = Image.Type.Simple;
+                frontImage.preserveAspect = true;
+                print("preserve aspect : " + frontImage.preserveAspect);
+            }    
         }
 
         GameManager.Instance.totalCards = allCards.Count;
